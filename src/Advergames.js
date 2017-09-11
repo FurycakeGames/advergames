@@ -7,6 +7,7 @@ create:function() {
   this.back_button = this.add.sprite(57, 41, 'back');
   this.back_button.inputEnabled = true
   this.back_button.events.onInputUp.add(function(){
+    this.music = this.game.sound.play('click');
     this.game.state.start('Menu');
   }, this);
 

@@ -12,6 +12,7 @@ Fury.Laberinto.prototype = {
     this.back_button = this.add.sprite(59, 30, 'home');
     this.back_button.inputEnabled = true
     this.back_button.events.onInputUp.add(function(){
+      this.music = this.game.sound.play('click');
       this.game.state.start('Menu');
     }, this);
 
@@ -284,6 +285,7 @@ Fury.Laberinto.prototype = {
   },
 
   popupScore: function(){
+  this.music = this.game.sound.play('chime');
   this.back_1 = this.game.add.graphics(0, 0);
   this.back_1.alpha = 0
   this.back_1.beginFill(0x000, 0.3);
@@ -346,10 +348,12 @@ Fury.Laberinto.prototype = {
   this.button_1.drawRoundedRect(85, 487, 164, 78, 300);
   this.button_1.inputEnabled = true;
   this.button_1.events.onInputUp.add(function(){
+    this.music = this.game.sound.play('click');
     this.game.state.start('Menu');
   }, this);
   this.button_1.alpha = 0;
-  this.buttontext_1 = this.game.add.bitmapText(167, 520, 'catamaran', 'Volver\nal inicio');
+  this.game.cache.getBitmapFont('catamaran').font.lineHeight = 90;
+  this.buttontext_1 = this.game.add.bitmapText(167, 517, 'catamaran', 'Volver\nal inicio');
   this.buttontext_1.align = 'center';
   this.buttontext_1.fontSize = 20;
   this.buttontext_1.anchor.x = 0.5;
@@ -361,17 +365,20 @@ Fury.Laberinto.prototype = {
   this.button_2.drawRoundedRect(275, 487, 164, 78, 300);
   this.button_2.inputEnabled = true;
   this.button_2.events.onInputUp.add(function(){
+    this.music = this.game.sound.play('click');
     this.game.state.restart();
   }, this);
   this.button_2.alpha = 0;
-  this.buttontext_2 = this.game.add.bitmapText(357, 520, 'catamaran', 'Jugar\nde nuevo');
+  this.buttontext_2 = this.game.add.bitmapText(357, 517, 'catamaran', 'Jugar\nde nuevo');
   this.buttontext_2.align = 'center';
   this.buttontext_2.fontSize = 20;
   this.buttontext_2.anchor.x = 0.5;
   this.buttontext_2.anchor.y = 0.5;
   this.buttontext_2.alpha = 0;
 
-
+  this.game.time.events.loop(Phaser.Timer.SECOND, function(){
+    this.game.cache.getBitmapFont('catamaran').font.lineHeight = 118;
+  }, this);
   this.game.add.tween(this.back_1).to( { alpha: 1 }, 500, "Linear", true, 0);
   this.game.add.tween(this.popup_text_1).to( { alpha: 1 }, 500, "Linear", true, 0);
   this.game.add.tween(this.popup_text_2).to( { alpha: 1 }, 500, "Linear", true, 0);

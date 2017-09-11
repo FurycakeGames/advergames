@@ -4,7 +4,6 @@ Fury.Menu.prototype = {
 
 
 create:function() {
-
   this.advergames = this.game.add.bitmapText(100, 135, 'gotham', 'Adver', 47);
   this.advergames.tint = 0xc2185b;
   this.advergames2 = this.game.add.bitmapText(244, 135, 'gotham', 'Games', 47);
@@ -30,6 +29,7 @@ create:function() {
   this.info_help = this.game.add.sprite(183, 38, 'help');
   this.info_help.inputEnabled = true
   this.info_help.events.onInputUp.add(function(){
+    this.music = this.game.sound.play('click');
     this.game.state.start('Advergames');
   }, this);
 
@@ -45,6 +45,7 @@ create:function() {
     this.button_1.alpha = 0
   }, this);
   this.button_1.events.onInputUp.add(function(){
+    this.music = this.game.sound.play('click');
     this.game.state.start('Pupiletrasinst');
   }, this);
 
@@ -60,6 +61,7 @@ create:function() {
     this.button_2.alpha = 0
   }, this);
   this.button_2.events.onInputUp.add(function(){
+    this.music = this.game.sound.play('click');
     this.game.state.start('Laberintoinst');
   }, this);
 

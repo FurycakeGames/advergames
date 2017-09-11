@@ -161,6 +161,7 @@ clockText:function(){
 
 
 popupScore: function(){
+  this.music = this.game.sound.play('chime');
   this.back_1 = this.game.add.graphics(0, 0);
   this.back_1.alpha = 0
   this.back_1.beginFill(0x000, 0.3);
@@ -223,10 +224,12 @@ popupScore: function(){
   this.button_1.drawRoundedRect(85, 487, 164, 78, 300);
   this.button_1.inputEnabled = true;
   this.button_1.events.onInputUp.add(function(){
+    this.music = this.game.sound.play('click');
     this.game.state.start('Menu');
   }, this);
   this.button_1.alpha = 0;
-  this.buttontext_1 = this.game.add.bitmapText(167, 520, 'catamaran', 'Volver\nal inicio');
+  this.game.cache.getBitmapFont('catamaran').font.lineHeight = 90;
+  this.buttontext_1 = this.game.add.bitmapText(167, 517, 'catamaran', 'Volver\nal inicio');
   this.buttontext_1.align = 'center';
   this.buttontext_1.fontSize = 20;
   this.buttontext_1.anchor.x = 0.5;
@@ -238,17 +241,20 @@ popupScore: function(){
   this.button_2.drawRoundedRect(275, 487, 164, 78, 300);
   this.button_2.inputEnabled = true;
   this.button_2.events.onInputUp.add(function(){
+    this.music = this.game.sound.play('click');
     this.game.state.restart();
   }, this);
   this.button_2.alpha = 0;
-  this.buttontext_2 = this.game.add.bitmapText(357, 520, 'catamaran', 'Jugar\nde nuevo');
+  this.buttontext_2 = this.game.add.bitmapText(357, 517, 'catamaran', 'Jugar\nde nuevo');
   this.buttontext_2.align = 'center';
   this.buttontext_2.fontSize = 20;
   this.buttontext_2.anchor.x = 0.5;
   this.buttontext_2.anchor.y = 0.5;
   this.buttontext_2.alpha = 0;
 
-
+  this.game.time.events.loop(Phaser.Timer.SECOND, function(){
+    this.game.cache.getBitmapFont('catamaran').font.lineHeight = 118;
+  }, this);
   this.game.add.tween(this.back_1).to( { alpha: 1 }, 500, "Linear", true, 0);
   this.game.add.tween(this.popup_text_1).to( { alpha: 1 }, 500, "Linear", true, 0);
   this.game.add.tween(this.popup_text_2).to( { alpha: 1 }, 500, "Linear", true, 0);
@@ -271,6 +277,7 @@ popupScore: function(){
 holding: function(){
   if (this.input.activePointer.isDown){
     if (this.clicking == false){
+      this.music = this.game.sound.play('click');
       this.startX = this.input.x
       this.startY = this.input.y
       this.tileX = Math.round((this.input.worldX - this.bufferX) / this.lettersize)
@@ -299,6 +306,7 @@ holding: function(){
         if (this.tileX == this.words[i][1] && this.tileY == this.words[i][2] && this.endX == this.words[i][3] && this.endY == this.words[i][4]) {
           if (!this.wordFound[i]){
             this.circleWord(i)
+            this.music = this.game.sound.play('ding');
             this.wordFound[i] = true
             this.wordRender[i].tint = 0xc2185b
             this.tween = this.add.tween(this.wordRender[i].scale).to( {y: 2}, 200, "Cubic", true);
@@ -314,6 +322,7 @@ holding: function(){
         else if (this.tileX == this.words[i][3] && this.tileY == this.words[i][4] && this.endX == this.words[i][1] && this.endY == this.words[i][2]) {
           if (!this.wordFound[i]){
             this.circleWord(i)
+            this.music = this.game.sound.play('ding');
             this.wordFound[i] = true
             this.wordRender[i].tint = 0xc2185b
             this.confettiToss(this.input.worldX, this.input.worldY)

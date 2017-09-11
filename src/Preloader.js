@@ -12,7 +12,6 @@ Fury.Preloader.prototype = {
     this.load.image('clock', 'assets/clock.png');
     this.load.image('star', 'assets/star1.png');
     this.load.image('star0', 'assets/star0.png');
-    this.load.image('square', 'assets/square.png');
     this.load.image('joystick', 'assets/joystick.png');
     this.load.image('back', 'assets/back.png');
     this.load.image('home', 'assets/home.png');
@@ -32,6 +31,11 @@ Fury.Preloader.prototype = {
 
     this.load.bitmapFont('catamaran', 'assets/catamaran.png','assets/catamaran.fnt');
     this.load.bitmapFont('gotham', 'assets/gotham.png','assets/gotham.fnt');
+
+    this.load.audio('chime', ['assets/chime.mp3']);
+    this.load.audio('ding', ['assets/ding.mp3']);
+    this.load.audio('click', ['assets/click.wav']);
+
     },
     create: function() {
         this.game.time.events.add(Phaser.Timer.SECOND, function()
