@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset=utf-8>
+		<title>My first three.js app</title>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="js/three.min.js"></script>
+		<script>
+			var i;
+
+			var scene = new THREE.Scene();
+
+			var camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 1000 );
+
+			var renderer = new THREE.WebGLRenderer();
+			renderer.shadowMap.enabled = true;
+			renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+			renderer.setSize( window.innerWidth * 0.8, window.innerHeight * 0.8);
+			document.body.appendChild( renderer.domElement );
+
+			var ambient = new THREE.AmbientLight( 0x404040 ); // soft white light
+			scene.add( ambient );
+
+			//Create a PointLight and turn on shadows for the light
+			var light = new THREE.PointLight( 0xffffff, 1, 100 );
+			light.position.set(2, -3, 3);
+			light.castShadow = true;            // default false
+			scene.add( light );
+
+			//Set up shadow properties for the light
+			light.shadow.mapSize.width = 1024;  // default
+			light.shadow.mapSize.height = 1024; // default
+			light.shadow.camera.near = 0.5;       // default
+			light.shadow.camera.far = 1000      // default
+
+
+			var floor_geometry = new THREE.CubeGeometry(5, 5, 0.1)
+			var floor_material = new THREE.MeshStandardMaterial({color: 0xffffff})
+			var floor = new THREE.Mesh(floor_geometry, floor_material );
+			scene.add( floor );
+			floor.position.y = 0
+			floor.position.z = -0.2;
+			floor.receiveShadow = true;
+
+			var cube_geometry = new THREE.CubeGeometry(0.3, 0.3, 0.3);
+			var cube_material = new THREE.MeshLambertMaterial({color:"red"});
+			var cube = new THREE.Mesh( cube_geometry, cube_material );
+			scene.add( cube );
+			cube.castShadow = true;
+			cube.cube = true
+			ascend(cube);
+			cube.rotationspeed.z = 0.05;
+			cube.position.y = 0;
+			cube.position.z = 1;
+			camera.position.z = 3;
+			camera.rotation.x = 1;
+			camera.position.y = -5;
+
+			var xAcceleration = 0.005;
+			var yAcceleration = 0.005;
+			var gravity = 0.01;
+
+			var keys = [];
+			keys.up = false;
+			keys.left = false;
+			keys.right = false;
+			keys.down = false;
+			keys.jump = false;
+
+			function ascend(self){
+				self.speed = [];
+				self.speed.x = 0;
+				self.speed.y = 0;
+				self.speed.z = 0;
+				self.rotationspeed = [];
+				self.rotationspeed.x = 0;
+				self.rotationspeed.y = 0;
+				self.rotationspeed.z = 0;
+			}
+
+			function createCoin(){
+
+			}
+
+
+			function createEnemy(){
+				var enemy_geometry = new THREE.CubeGeometry(0.5, 0.5, 0.5);
+				var enemy_material = new THREE.MeshNormalMaterial()
+				var enemy = new THREE.Mesh( enemy_geometry, enemy_material );
+				ascend(enemy);
+				scene.add(enemy);
+				i = Math.ceil(Math.random() * 3)
+				switch(i) {
+			    case 3:
+						enemy.position.y = 10;
+						enemy.position.x = Math.random() * 5 - 2.5;
+						enemy.speed.y = -0.05 * Math.random() - 0.03;
+			      break;
+			    case 2:
+						enemy.position.x = -10;
+						enemy.position.y = Math.random() * 5 - 2.5;
+						enemy.speed.x = 0.05 * Math.random() + 0.03;
+			       break;
+			    case 1:
+						enemy.position.x = 10;
+						enemy.position.y = Math.random() * 5 - 2.5;
+						enemy.speed.x = -0.05 * Math.random() - 0.03;
+				}
+
+				enemy.position.z = 0.1
+				enemy.cube = true;
+				enemy.receiveShadow = true;
+				enemy.castShadow = true;
+				enemy.enemy = true;
+			}
+
+			createEnemy();
+			createEnemy();
+			createEnemy();
+			createEnemy();
+			createEnemy();
+
+//movement
+			function movement(){
+				scene.traverse(function(node) {
+					if (node instanceof THREE.Mesh){
+						if (node.cube){
+							node.position.x += node.speed.x;
+							node.position.y += node.speed.y;
+							node.position.z += node.speed.z;
+							node.rotation.x += node.rotationspeed.x;
+							node.rotation.y += node.rotationspeed.y;
+							node.rotation.z += node.rotationspeed.z;
+						}
+					}
+				});
+			}
+
+			document.addEventListener("keyup", onDocumentKeyUp, false);
+			function onDocumentKeyUp(event) {
+		    var keyCode = event.which;
+		    if (keyCode == 87) {
+		    	keys.up = false;
+		    }
+		    if (keyCode == 83) {
+		    	keys.down = false;
+		    }
+		    if (keyCode == 65) {
+		    	keys.left = false;
+		    }
+		    if (keyCode == 68) {
+		    	keys.right = false;
+		    }
+		    if (keyCode == 32) {
+					keys.jump = false;
+		    }
+			};
+
+
+			document.addEventListener("keydown", onDocumentKeyDown, false);
+			function onDocumentKeyDown(event) {
+		    var keyCode = event.which;
+		    if (keyCode == 87) {
+		    	keys.up = true;
+		    }
+		    if (keyCode == 83) {
+		    	keys.down = true;
+		    }
+		    if (keyCode == 65) {
+		    	keys.left = true;
+		    }
+		    if (keyCode == 68) {
+		    	keys.right = true;
+		    }
+		    if (keyCode == 32) {
+		    	if (keys.jump == false && cube.position.z == 0){
+						cube.speed.z = 0.15;
+						keys.jump = true;
+		    	}
+		    }
+			};
+
+			function jumping() {
+				if (cube.position.z > 0){
+					cube.speed.z -= gravity
+				}
+				if (cube.position.z < 0){
+					cube.speed.z = 0
+					cube.position.z = 0
+				}
+			};
+
+			function update(){
+				//controls
+				if (keys.left){
+					cube.speed.x = -0.05;
+				}
+				else if (keys.right){
+					cube.speed.x = 0.05;
+				}
+				else if (!keys.right && !keys.left){
+					cube.speed.x = 0;
+				}
+				if (keys.up){
+					cube.speed.y = 0.05;
+				}
+				else if (keys.down){
+					cube.speed.y = -0.05;
+				}
+				else if (!keys.up && !keys.down){
+					cube.speed.y = 0;
+				}
+
+				scene.traverse(function(node) {
+					if (node instanceof THREE.Mesh){
+						if (node.enemy){
+							if (node.position.x < -12 || node.position.x > 12 || node.position.y < -12){
+								scene.remove(node)
+								createEnemy()
+							}
+						}
+					}
+				});
+			}
+
+
+			function animate() {
+				requestAnimationFrame( animate );
+				renderer.render( scene, camera );
+				camera.lookAt(cube.position );
+				camera.rotation.z = 0;
+
+				movement();
+				update();
+				jumping();
+			};
+			animate();
+		</script>
+	</body>
+</html>
