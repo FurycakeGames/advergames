@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset=utf-8>
-		<title>My first three.js app</title>
+		<title>Gemu</title>
 		<style>
 			body { margin: 0; }
 			canvas { width: 100%; height: 100% }
@@ -11,11 +11,34 @@
 	<body>
 		<script src="js/three.min.js"></script>
 		<script>
+
+			var score = 0;
+
+			var scoretext = document.createElement('div');
+			scoretext.style.position = 'absolute';
+			//text2.style.zIndex = 1;    // if you still don't see the label, try uncommenting this
+			scoretext.style.width = 200;
+			scoretext.style.height = 200;
+			scoretext.style.color = "white";
+			scoretext.innerHTML = "Score: " + score;
+			scoretext.style.top = 20 + 'px';
+			scoretext.style.left = 20 + 'px';
+			document.body.appendChild(scoretext);
+
+			function getDistance(mesh1, mesh2) { 
+			  var dx = mesh1.position.x - mesh2.position.x; 
+			  var dy = mesh1.position.y - mesh2.position.y; 
+			  var dz = mesh1.position.z - mesh2.position.z; 
+			  return Math.sqrt(dx*dx+dy*dy+dz*dz); 
+			}
+
 			var i;
 
-			var scene = new THREE.Scene();
+			var scene = new THREE.Scene;
 
 			var camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 1000 );
+			camera.position.z = 5;
+			camera.position.y = -5;
 
 			var renderer = new THREE.WebGLRenderer();
 			renderer.shadowMap.enabled = true;
@@ -23,12 +46,12 @@
 			renderer.setSize( window.innerWidth * 0.8, window.innerHeight * 0.8);
 			document.body.appendChild( renderer.domElement );
 
-			var ambient = new THREE.AmbientLight( 0x404040 ); // soft white light
+			var ambient = new THREE.AmbientLight( 0x404040, 2 ); // soft white light
 			scene.add( ambient );
 
 			//Create a PointLight and turn on shadows for the light
-			var light = new THREE.PointLight( 0xffffff, 1, 100 );
-			light.position.set(2, -3, 3);
+			var light = new THREE.PointLight( 0xffffff, 0.5, 100 );
+			light.position.set(1, -2, 3);
 			light.castShadow = true;            // default false
 			scene.add( light );
 
@@ -39,27 +62,45 @@
 			light.shadow.camera.far = 1000      // default
 
 
-			var floor_geometry = new THREE.CubeGeometry(5, 5, 0.1)
-			var floor_material = new THREE.MeshStandardMaterial({color: 0xffffff})
-			var floor = new THREE.Mesh(floor_geometry, floor_material );
-			scene.add( floor );
-			floor.position.y = 0
-			floor.position.z = -0.2;
-			floor.receiveShadow = true;
+			// Ground
+			var ground_material = new THREE.MeshLambertMaterial({color: 0xaaaaaa});
+			var ground = new THREE.Mesh(new THREE.BoxGeometry(5, 5, 0.1), ground_material);
+			ground.position.z = -0.2;
+			ground.receiveShadow = true;
+			scene.add( ground );
+
+
+			function createCoin(){
+				var coin_material = new THREE.MeshLambertMaterial({color: 0xFFFF00});
+				var coin_geometry =	new THREE.CylinderGeometry(0.2, 0.2, 0.05, 30, 1, false, 0, 2 * Math.PI);
+				var coin = new THREE.Mesh(coin_geometry, coin_material);
+				coin.position.x = Math.random() * 4.5 - 2.25;
+				coin.position.y = Math.random() * 4.5 - 2.25;
+				coin.position.z = 0.2;
+				if (Math.random() > 0.8){
+					coin.position.z = 1;
+				}
+				ascend(coin);
+				coin.cube = true;
+				coin.rotationspeed.z = 0.05;
+				coin.castShadow = true;
+				coin.coin = true;
+				scene.add( coin );
+			}
+
+			createCoin();
 
 			var cube_geometry = new THREE.CubeGeometry(0.3, 0.3, 0.3);
 			var cube_material = new THREE.MeshLambertMaterial({color:"red"});
-			var cube = new THREE.Mesh( cube_geometry, cube_material );
+			var cube = new THREE.Mesh(cube_geometry, cube_material);
 			scene.add( cube );
 			cube.castShadow = true;
 			cube.cube = true
+			cube.player = true
 			ascend(cube);
-			cube.rotationspeed.z = 0.05;
+//			cube.rotationspeed.z = 0.05;
 			cube.position.y = 0;
 			cube.position.z = 1;
-			camera.position.z = 3;
-			camera.rotation.x = 1;
-			camera.position.y = -5;
 
 			var xAcceleration = 0.005;
 			var yAcceleration = 0.005;
@@ -83,15 +124,12 @@
 				self.rotationspeed.z = 0;
 			}
 
-			function createCoin(){
-
-			}
 
 
 			function createEnemy(){
 				var enemy_geometry = new THREE.CubeGeometry(0.5, 0.5, 0.5);
-				var enemy_material = new THREE.MeshNormalMaterial()
-				var enemy = new THREE.Mesh( enemy_geometry, enemy_material );
+				var enemy_material = new THREE.MeshNormalMaterial();
+				var enemy = new THREE.Mesh(enemy_geometry, enemy_material);
 				ascend(enemy);
 				scene.add(enemy);
 				i = Math.ceil(Math.random() * 3)
@@ -122,8 +160,6 @@
 			createEnemy();
 			createEnemy();
 			createEnemy();
-			createEnemy();
-			createEnemy();
 
 //movement
 			function movement(){
@@ -144,16 +180,16 @@
 			document.addEventListener("keyup", onDocumentKeyUp, false);
 			function onDocumentKeyUp(event) {
 		    var keyCode = event.which;
-		    if (keyCode == 87) {
+		    if (keyCode == 38) {
 		    	keys.up = false;
 		    }
-		    if (keyCode == 83) {
+		    if (keyCode == 40) {
 		    	keys.down = false;
 		    }
-		    if (keyCode == 65) {
+		    if (keyCode == 37) {
 		    	keys.left = false;
 		    }
-		    if (keyCode == 68) {
+		    if (keyCode == 39) {
 		    	keys.right = false;
 		    }
 		    if (keyCode == 32) {
@@ -162,19 +198,20 @@
 			};
 
 
+
 			document.addEventListener("keydown", onDocumentKeyDown, false);
 			function onDocumentKeyDown(event) {
 		    var keyCode = event.which;
-		    if (keyCode == 87) {
+		    if (keyCode == 38) {
 		    	keys.up = true;
 		    }
-		    if (keyCode == 83) {
+		    if (keyCode == 40) {
 		    	keys.down = true;
 		    }
-		    if (keyCode == 65) {
+		    if (keyCode == 37) {
 		    	keys.left = true;
 		    }
-		    if (keyCode == 68) {
+		    if (keyCode == 39) {
 		    	keys.right = true;
 		    }
 		    if (keyCode == 32) {
@@ -223,7 +260,21 @@
 								scene.remove(node)
 								createEnemy()
 							}
+							if (getDistance(node, cube) < 0.4){
+								scene.remove(cube)
+								scoretext.innerHTML = "x.x moristeS, Score: " + score;
+							}
 						}
+						if (node.coin){
+							if (getDistance(node, cube) < 0.4){
+								score += 1;
+								scoretext.innerHTML = "Score: " + score;
+								scene.remove(node);
+								createCoin();
+								createEnemy();
+							}
+						}
+
 					}
 				});
 			}
