@@ -186,6 +186,8 @@ function onDocumentKeyUp(event) {
   }
   if (keyCode == 90) {
   	keys.accelerate = false;
+   	low.fade(0.5, 0.3, 200, id)
+   	low.volume(0.3, id)
   }
   if (keyCode == 81) {
   	keys.q = false;
@@ -195,16 +197,37 @@ function onDocumentKeyUp(event) {
   }
 };
 
+var bullets = [];
+
+var zap = new Howl({
+  src: ['sound/laser.ogg'],
+  volume: 0.02
+});
+
+var low = new Howl({
+  src: ['sound/low.ogg'],
+  volume: 0.3,
+  loop: true,
+});
+
+var asteroid_destroy = new Howl({
+  src: ['sound/asteroid.ogg'],
+  volume: 0.5,
+});
+
+id = low.play();
+
 function createBullet(){
-	var bullet_material = new THREE.MeshLambertMaterial({color: 0x009900});
-	var bullet_geometry =	new THREE.BoxGeometry(0.7, 0.7, 0.7);
-	var bullet = new THREE.Mesh(bullet_geometry, bullet_material);
+	zap.play();
+	bullet = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.7, 0.7), new THREE.MeshLambertMaterial({color: 0x999900}))
 	bullet.position.set(cube.position.x, cube.position.y, cube.position.z);
 	bullet.rotation.set(cube.rotation.x, cube.rotation.y, cube.rotation.z);
 	bullet.bullet = true;
 	bullet.translateZ(-3);
 	bullet.distance = 0;
+	bullet.alive = true;
 	scene.add(bullet);
+	bullets.push(bullet);
 }
 
 
@@ -230,15 +253,14 @@ function onDocumentKeyDown(event) {
   }
   if (keyCode == 90) {
   	keys.accelerate = true;
+   	low.fade(0.3, 0.5, 200, id)
+    low.volume(0.5, id)
   }
   if (keyCode == 81) {
   	keys.q = true;
   }
   if (keyCode == 69) {
   	keys.e = true;
-  }
-  if (keyCode == 88) {
-  	shoot();
   }
 };
 
@@ -257,6 +279,21 @@ var deletos = false;
 function update(){
 	if (!cube){
 		return
+	}
+
+	for (var index = 0; index < bullets.length; index += 1){
+		if (bullets[index] === undefined) continue;
+		if (bullets[index].distance < 200){
+			bullets[index].distance += 1;
+		}
+		else{
+			bullets[index].alive = false;
+			scene.remove(bullets[index])
+		}
+		if (bullets[index].alive == false){
+			bullets.splice(index, 1);
+			continue;
+		}
 	}
 
 	camera.position.z = -20 - accel / 20
@@ -353,19 +390,14 @@ function update(){
 	}
 
 
+
+
 	scene.traverse(function(node) {
-		deletos = false;
 
 
 		if (node instanceof THREE.Mesh){
 			if (node.bullet){
-				if (node.distance > 100){
-					scene.remove(node)
-					node = null;
-					return
-				}
 				node.translateZ(15);
-				node.distance += 1;
 				scene.traverse(function(nodo){
 					if (nodo.asteroid){
 						if (getDistance(node, nodo) < nodo.size / 1.5){
@@ -373,10 +405,13 @@ function update(){
 								createAsteroid(nodo.position.x, nodo.position.y, nodo.position.z, nodo.size / 2)
 								createAsteroid(nodo.position.x, nodo.position.y, nodo.position.z, nodo.size / 2)
 							}
-							scene.remove(node)
-							node = null;
-							scene.remove(nodo)
-							nodo = null;
+							asteroid_destroy.play();
+							setTimeout(function(){
+								scene.remove(node);
+								node.alive = false;
+								scene.remove(nodo);
+								nodo = null;
+							}, 0)
 							score += 1;
 							scoretext.innerHTML = "Score: " + score;
 							deletos = true;
@@ -386,8 +421,7 @@ function update(){
 				})
 			}
 
-
-			if (node.asteroid && !deletos){
+			if (node.asteroid){
 				if (node.position.x > 750){
 					node.position.x = -749
 				}
@@ -408,7 +442,7 @@ function update(){
 				}
 			}
 
-			if (node.asteroid && !deletos){
+			if (node.asteroid){
 				if (getDistance(node, cube) < node.size / 1.5){
 					scene.remove(cube)
 					cube = null;
@@ -417,6 +451,8 @@ function update(){
 			}
 		}
 	});
+
+
 }
 
 
