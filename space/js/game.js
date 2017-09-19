@@ -1,3 +1,16 @@
+var cursorX;
+var cursorY;
+document.onmousemove = function(e){
+    cursorX = e.pageX;
+    cursorY = e.pageY;
+}
+setInterval("checkCursor()", 1000);
+function checkCursor(){
+//    alert("Cursor at: " + cursorX + ", " + cursorY);
+}
+
+
+
 var score = 0;
 
 function getDistance(mesh1, mesh2) { 
@@ -14,8 +27,8 @@ scoretext.style.height = 200;
 scoretext.style.color = "white";
 scoretext.innerHTML = "Score: " + score;
 scoretext.style.top = 20 + 'px';
-scoretext.style.left = 20 + 'px';
-document.body.appendChild(scoretext);
+scoretext.style.left = 200 + 'px';
+document.getElementById("canvas").appendChild(scoretext);
 
 var i;
 
@@ -24,35 +37,43 @@ var scene = new THREE.Scene;
 var camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 100000 );
 camera.position.z = -20;
 camera.position.y = 5;
-camera.rotation.y = Math.PI
+camera.rotation.y = Math.PI;
 
 var renderer = new THREE.WebGLRenderer();
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
 renderer.setSize( window.innerWidth * 0.8, window.innerHeight * 0.8);
-document.body.appendChild( renderer.domElement );
+document.getElementById("canvas").appendChild( renderer.domElement );
+
+var mouseX = window.innerWidth / 2;
+var mouseY = 510 / 2;
+
+renderer.domElement.addEventListener("mousemove", getPosition, false);
+
+function getPosition(event){
+  mouseX = event.x - window.innerWidth / 2;
+  mouseY = event.y - 510 / 2;
+}
+
 
 var ambient = new THREE.AmbientLight( 0x404040, 50 ); // soft white light
 scene.add( ambient );
 
 
-
-
-
 function createStar(){
 	var star_material = new THREE.MeshLambertMaterial({color: 0xFFFFFF});
-	var star_geometry =	new THREE.BoxGeometry(2, 2, 2);
+	var star_geometry =	new THREE.BoxGeometry(3, 3, 3);
 	var star = new THREE.Mesh(star_geometry, star_material);
-	star.position.x = Math.random() * 1500 - 750;
-	star.position.y = Math.random() * 1500 - 750;
-	star.position.z = Math.random() * 1500 - 750;
+	star.position.x = Math.random() * 2000 - 1000;
+	star.position.y = Math.random() * 2000 - 1000;
+	star.position.z = Math.random() * 2000 - 1000;
 	star.rotation.x = Math.random() * Math.PI;
 	star.rotation.y = Math.random() * Math.PI;
 	star.rotation.z = Math.random() * Math.PI;
 	scene.add(star);
 }
 
-for (i = 0; i < 750; i++) { 
+for (i = 0; i < 1000; i++) { 
 	createStar();
 }
 
@@ -71,12 +92,12 @@ function createAsteroid(_x, _y, _z, size){
 	asteroid.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2);
 	asteroid.cube = true;
 	asteroid.asteroid = true;
-	asteroid.speed.x = (Math.random() - 0.5) * 2;
-	asteroid.speed.y = (Math.random() - 0.5) * 2;
-	asteroid.speed.z = (Math.random() - 0.5) * 2;
-	asteroid.rotationspeed.x = (Math.random() - 0.5) * 0.02;
-	asteroid.rotationspeed.y = (Math.random() - 0.5) * 0.02;
-	asteroid.rotationspeed.z = (Math.random() - 0.5) * 0.02;
+	asteroid.speed.x = (Math.random() - 0.5) / size * 50;
+	asteroid.speed.y = (Math.random() - 0.5) / size * 50;
+	asteroid.speed.z = (Math.random() - 0.5) / size * 50;
+	asteroid.rotationspeed.x = (Math.random() - 0.5) / size * 1.5;
+	asteroid.rotationspeed.y = (Math.random() - 0.5) / size * 1.5;
+	asteroid.rotationspeed.z = (Math.random() - 0.5) / size * 1.5;
 }
 
 for (i = 0; i < 50; i++) {
@@ -103,6 +124,7 @@ loader.load("models/spaceship.json", function(geometry, mat) {
   }
 );
 
+var shootTimer = 50;
 
 var xAcceleration = 0.005;
 var yAcceleration = 0.005;
@@ -174,7 +196,7 @@ function onDocumentKeyUp(event) {
 };
 
 function createBullet(){
-	var bullet_material = new THREE.MeshLambertMaterial({color: 0xFFFF00});
+	var bullet_material = new THREE.MeshLambertMaterial({color: 0x009900});
 	var bullet_geometry =	new THREE.BoxGeometry(0.7, 0.7, 0.7);
 	var bullet = new THREE.Mesh(bullet_geometry, bullet_material);
 	bullet.position.set(cube.position.x, cube.position.y, cube.position.z);
@@ -183,7 +205,6 @@ function createBullet(){
 	bullet.translateZ(5);
 	bullet.distance = 0;
 	scene.add(bullet);
-
 }
 
 
@@ -231,10 +252,18 @@ accelX = 0;
 accelZ = 0;
 accel = 0;
 
+var deletos = false;
+
 function update(){
 	if (!cube){
 		return
 	}
+
+	camera.position.z = -20 - accel / 20
+	camera.rotation.z = accelZ / 500 - accelY / 400;
+	camera.rotation.y = Math.PI - accelY / 1000;
+	camera.rotation.x = accelX / 1000;
+
 	cube.translateZ(1 + 6 * accel / 100);
 
 	if (keys.accelerate){
@@ -275,6 +304,20 @@ function update(){
 		accelY = Math.min(accelY + 2, 0)
 	}
 
+	if (mouseX < -25){
+		accelY = Math.min(accelY - (mouseX + 25)/ 40, 50);
+	}
+	if (mouseX > 25){
+		accelY = Math.max(accelY - (mouseX - 25)/ 40, -50);
+	}
+	if (mouseY < -25){
+		accelX = Math.max(accelX + (mouseY + 25)/ 20, -50);
+	}
+	if (mouseY > 25){
+		accelX = Math.min(accelX + (mouseY - 25)/ 20, 50);
+	}
+
+
 	if (keys.up){
 		accelX = Math.max(accelX - 4, -100)
 	}
@@ -290,10 +333,38 @@ function update(){
 	}
 
 
+	if (cube.position.x > 750){
+		cube.position.x = -749
+	}
+	if (cube.position.x < -750){
+		cube.position.x = 749
+	}
+	if (cube.position.y > 750){
+		cube.position.y = -749
+	}
+	if (cube.position.y < -750){
+		cube.position.y = 749
+	}
+	if (cube.position.z > 750){
+		cube.position.z = -749
+	}
+	if (cube.position.z < -750){
+		cube.position.z = 749
+	}
+
+
 	scene.traverse(function(node) {
+		deletos = false;
+
+
 		if (node instanceof THREE.Mesh){
 			if (node.bullet){
-				node.translateZ(10);
+				if (node.distance > 100){
+					scene.remove(node)
+					node = null;
+					return
+				}
+				node.translateZ(15);
 				node.distance += 1;
 				scene.traverse(function(nodo){
 					if (nodo.asteroid){
@@ -302,20 +373,21 @@ function update(){
 								createAsteroid(nodo.position.x, nodo.position.y, nodo.position.z, nodo.size / 2)
 								createAsteroid(nodo.position.x, nodo.position.y, nodo.position.z, nodo.size / 2)
 							}
-
 							scene.remove(node)
+							node = null;
 							scene.remove(nodo)
+							nodo = null;
 							score += 1;
 							scoretext.innerHTML = "Score: " + score;
+							deletos = true;
+							return
 						}
 					}
 				})
-				if (node.distance > 100){
-					scene.remove(node)
-				}
 			}
 
-			if (node.asteroid){
+
+			if (node.asteroid && !deletos){
 				if (node.position.x > 750){
 					node.position.x = -749
 				}
@@ -336,9 +408,10 @@ function update(){
 				}
 			}
 
-			if (node.asteroid){
+			if (node.asteroid && !deletos){
 				if (getDistance(node, cube) < node.size / 1.5){
 					scene.remove(cube)
+					cube = null;
 					scoretext.innerHTML = "x.x moristeS, Score: " + score;
 				}
 			}
@@ -353,7 +426,11 @@ function animate() {
 	renderer.render( scene, camera );
 
 //				camera.lookAt(cube.position );
-
+	shootTimer -= 1;
+	if (shootTimer < 0){
+		shootTimer = 20;
+		shoot();
+	}
 
 	movement();
 	update();
