@@ -202,7 +202,7 @@ function createBullet(){
 	bullet.position.set(cube.position.x, cube.position.y, cube.position.z);
 	bullet.rotation.set(cube.rotation.x, cube.rotation.y, cube.rotation.z);
 	bullet.bullet = true;
-	bullet.translateZ(5);
+	bullet.translateZ(-3);
 	bullet.distance = 0;
 	scene.add(bullet);
 }
@@ -303,7 +303,7 @@ function update(){
 	if (accelY < 0){
 		accelY = Math.min(accelY + 2, 0)
 	}
-
+/*
 	if (mouseX < -25){
 		accelY = Math.min(accelY - (mouseX + 25)/ 40, 50);
 	}
@@ -316,7 +316,7 @@ function update(){
 	if (mouseY > 25){
 		accelX = Math.min(accelX + (mouseY - 25)/ 20, 50);
 	}
-
+*/
 
 	if (keys.up){
 		accelX = Math.max(accelX - 4, -100)
