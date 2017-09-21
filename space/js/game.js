@@ -26,7 +26,7 @@ scoretext.style.width = 200;
 scoretext.style.height = 200;
 scoretext.style.color = "white";
 scoretext.innerHTML = "Score: " + score;
-scoretext.style.top = 20 + 'px';
+scoretext.style.top = 30 + 'px';
 scoretext.style.left = 200 + 'px';
 document.getElementById("canvas").appendChild(scoretext);
 
@@ -119,6 +119,7 @@ loader.load("models/spaceship.json", function(geometry, mat) {
 	cube.position.z = 5;
 	cube.scale.set(0.1, 0.1, 0.1)
 	cube.rotation.z = Math.PI
+	cube.rotation.y = Math.PI / 2
 	cube.add(camera);
 	scene.add(cube);
   }
@@ -446,7 +447,7 @@ function update(){
 				if (getDistance(node, cube) < node.size / 1.5){
 					scene.remove(cube)
 					cube = null;
-					scoretext.innerHTML = "x.x moristeS, Score: " + score;
+					scoretext.innerHTML = "x.x Score: " + score;
 				}
 			}
 		}
