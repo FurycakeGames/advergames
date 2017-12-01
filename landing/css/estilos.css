@@ -16,7 +16,7 @@
 	src:url(../fonts/YoungBeautiful.ttf);
 }
 .contenedor{
-	background:#000;
+	background:#ffbe00;
 }
 
 .imagen{
@@ -34,11 +34,13 @@
 	  height:auto;
 }
 
-.enviar{
-	position:absolute;
-	  margin-top: -25%;
-	  left: 11%;
-	  width:30%;
-	  height:auto;
-	
+.formA{
+	width:30%;
 }
+
+.formB{
+	width:10%;
+	margin-right:100px;
+	float:right;
+}
+
