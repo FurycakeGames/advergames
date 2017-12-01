@@ -34,13 +34,10 @@
 	  height:auto;
 }
 
-.formA{
-	width:30%;
+.enviar{
+	position:absolute;
+	  margin-top: -13%;
+	  left: 35%;
+	  width:30%;
+	  height:auto;
 }
-
-.formB{
-	width:10%;
-	margin-right:100px;
-	float:right;
-}
-
