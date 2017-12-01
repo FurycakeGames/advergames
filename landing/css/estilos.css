@@ -1,0 +1,35 @@
+* {
+        margin: 0px;
+        padding: 0px;
+        border: 0;
+        outline: 0;
+        font-size: 100%;
+        vertical-align: baseline;
+        background: transparent;
+    }
+
+
+@charset "UTF-8";
+/* CSS Document */
+@font-face{
+	font-family:miFuente1;
+	src:url(../fonts/YoungBeautiful.ttf);
+}
+.contenedor{
+	background:#000;
+}
+
+.imagen{
+    margin-bottom: -5px;
+
+	width:100%;
+	height:auto;
+}
+
+.boton{
+	position:absolute;
+	  margin-top: -25%;
+	  left: 11%;
+	  width:30%;
+	  height:auto;
+}
