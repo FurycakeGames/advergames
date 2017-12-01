@@ -1,3 +1,31 @@
+<?php
+if (isset($_POST['correo']) && isset($_POST['respuesta'])){
+$correo = $_POST['correo'];
+$respuesta = $_POST['respuesta'];
+$to = 'alessandra.serruto@gmail.com';
+$subject = "Rockit feedback";
+$body = '<html>
+			<body>
+				<h2>Feedback - example.com</h2>
+				<hr>
+				<p>Correo<br>'.$correo.'</p>
+				<p>Respuesta<br>'.$respuesta.'</p>
+			</body>
+		</html>';
+$headers = "From: ".$correo."";
+
+
+$send = mail($to, $subject, $body,$headers);
+if($send){
+	echo '<br>';
+	echo '¡Gracias por contactarnos!, ......';
+} else{
+	echo 'error';
+}
+}
+?>
+
+
 <!doctype html>
 <html>
 <head>
